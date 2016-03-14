@@ -1,0 +1,1 @@
+class MarkupException(Exception): pass
