@@ -1,8 +1,8 @@
 import copy
 import curses
 
-import Defaults as defaults
-from Exceptions import MarkupException
+from . import Defaults as defaults
+from .Exceptions import MarkupException
 
 class Specter():
   def __init__(self, markupSet={}):
