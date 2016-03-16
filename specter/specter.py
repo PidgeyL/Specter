@@ -64,12 +64,21 @@ class Specter():
       print(self.markup)
       raise(MarkupException)
 
-  def scrollDisplay(self, text,header=[],footer=[],cursor=False,limit=True):
+  def scrollDisplay(self, text,header=[],footer=[],cursor=False,limit=True,nav={}):
     try:
       # Default Values
       contInd=0
       cursInd=0
       cursPos=0
+
+      # Extend the navigation
+      navSet = copy.copy(defaults.navSet) # Copy default settings
+      for dKey in nav.keys(): # Add all the custom keys
+        if dKey not in navSet.keys(): navSet[dKey]=[] # Ensure it exists
+        for val in nav[dKey]: # Add all values that match the type
+          if   type(val) is int: navSet[dKey].append(val)
+          elif type(val) is str: navSet[dKey].append(ord(val))
+
       # Set cursor position if given (and int)
       if type(cursor)==int:
         maxy,maxx=self.screen.getmaxyx()
@@ -92,6 +101,8 @@ class Specter():
           # scroll to corresponding index
           contInd=cursInd-maxCont+1
         cursor=True
+
+      # Start Display-loop
       while True:
         # Get the maximum content size
         maxy,maxx=self.screen.getmaxyx()
@@ -125,26 +136,26 @@ class Specter():
           self.screen.addstr((maxy-len(footer)-1)+i,2,line)
 
         # Wait for the user to make a move
-        x=self.screen.getch()
-        if x==ord('u') or x==curses.KEY_UP:
+        key=self.screen.getch()
+        if key in navSet['up']:
           if cursor:
             if cursInd>0:cursInd-=1
             if cursPos==0 and contInd>0:contInd-=1
             if cursPos>0:cursPos-=1
           else:
             if contInd>0:contInd-=1
-        elif x==ord('d') or x==curses.KEY_DOWN:
+        elif key in navSet['down']:
           if cursor:
             if cursInd<len(text)-1:cursInd+=1
             if cursPos==maxCont-1 and (len(text)-contInd)>maxCont:contInd+=1
             if cursPos<maxCont-1 and cursPos<len(text)-1:cursPos+=1
           else:
             if (len(text)-contInd)>maxCont:contInd+=1
-        elif x==ord('q'):
-          return ord('q') if limit else (ord('q'),cursInd)
+        elif key in navSet['esc']:
+          return chr(key) if limit else (chr(key),cursInd)
         else:
           if not limit:
-            return (x,cursInd)
+            return (chr(key),cursInd)
     except Exception as e:
       self.stop()
       raise(e)
