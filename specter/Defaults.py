@@ -12,10 +12,12 @@ cursColors = {'red':    curses.COLOR_RED,
               'yellow': curses.COLOR_YELLOW,
               'blue':   curses.COLOR_BLUE}
 
-KEY_ESC = 27 # Curses Value of the ESC key (And ALT)
+KEY_ESC = 27   # Curses Value of the ESC key (And ALT)
+KEY_ENTER = 10 # Curses Value of the Enter key
 
 navSet = {'up':    [curses.KEY_UP],
           'down':  [curses.KEY_DOWN],
           'left':  [curses.KEY_LEFT],
           'right': [curses.KEY_RIGHT],
-          'esc':   [KEY_ESC]}
+          'esc':   [KEY_ESC],
+          'enter': [KEY_ENTER]}

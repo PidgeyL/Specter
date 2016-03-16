@@ -64,7 +64,7 @@ class Specter():
       print(self.markup)
       raise(MarkupException)
 
-  def scrollDisplay(self, text,header=[],footer=[],cursor=False,limit=True,nav={}):
+  def scrollDisplay(self, text,header=[],footer=[],cursor=False,blocking=True,nav={}):
     try:
       # Default Values
       contInd=0
@@ -116,7 +116,7 @@ class Specter():
         # Print the content to the screen
         #  - Header
         for i,line in enumerate(header):
-          self.screen.addstr(i+1,2,line, self.getMarku('header'))
+          self.screen.addstr(i+1,2,line, self.getMarkup('header'))
         #  - Content
         for i,line in enumerate(lines):
           if 'm' in line:
@@ -152,9 +152,12 @@ class Specter():
           else:
             if (len(text)-contInd)>maxCont:contInd+=1
         elif key in navSet['esc']:
-          return chr(key) if limit else (chr(key),cursInd)
+          return chr(key) if blocking else (chr(key),cursInd)
+        elif key in navSet['enter'] and cursor:
+          if 'a' in text[cursInd]: # There is an action
+            text[cursInd]['a']()
         else:
-          if not limit:
+          if not blocking:
             return (chr(key),cursInd)
     except Exception as e:
       self.stop()
