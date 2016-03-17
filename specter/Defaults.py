@@ -3,7 +3,8 @@ import curses
 mkset = {'normal': ('white', 'black', False),
          'bold':   ('white', 'black', True),
          'header': ('red',   'black', True), 
-         'footer': ('red',   'black', True)}
+         'footer': ('red',   'black', True),
+         'title':  ('blue',  'black', True)}
 
 cursColors = {'red':    curses.COLOR_RED,
               'white':  curses.COLOR_WHITE,

@@ -133,7 +133,7 @@ class Specter():
           self.screen.addstr(cursPos+s,1,">")
         #  - Footer
         for i,line in enumerate(footer):
-          self.screen.addstr((maxy-len(footer)-1)+i,2,line)
+          self.screen.addstr((maxy-len(footer)-1)+i,2,line, self.getMarkup('footer'))
 
         # Wait for the user to make a move
         key=self.screen.getch()
