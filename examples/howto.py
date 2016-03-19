@@ -8,7 +8,7 @@ def mainPage():
   h=['Main Page']
   # We use g as a placeholder (goto) to know which function to trigger
   t=[{'t': "Overview Functions", 'a': functions}]
-  screen.scrollDisplay(t, header=h, footer=df, cursor=True)
+  screen.scroll(t, header=h, footer=df, cursor=True)
 
 def functions():
   h=['Overview Functions']
@@ -31,7 +31,7 @@ def functions():
      {'t': "   -> Press Entr here to see an more information and examples"},
      {'t': " "},
      {'t': "INFO: This page is made using scrollDisplay, with cursor=True", 'm': 'bold'}]
-  screen.scrollDisplay(t, header=h, footer=df, cursor=True)
+  screen.scroll(t, header=h, footer=df, cursor=True)
 
 def textExample():
   h=['Example text format']
@@ -54,7 +54,7 @@ def textExample():
      {'t': "        (Later on, we will also support strings containing code)"},
      {'t': " "},
      {'t': "INFO: This page is made using scrollDisplay, with cursor=False", 'm': 'bold'}]
-  screen.scrollDisplay(t, header=h, footer=df)
+  screen.scroll(t, header=h, footer=df)
 
 
 mainPage()

@@ -64,7 +64,41 @@ class Specter():
       print(self.markup)
       raise(MarkupException)
 
-  def scrollDisplay(self, text,header=[],footer=[],cursor=False,blocking=True,nav={}):
+  def _print(self, y, x, line, markdown=None):
+    if type(line) == str: line = {'t': line} # Transform to dict
+    if type(line) == dict: # Valid line to print
+      if type(markdown) == str: line['m']=markdown # Apply markdown
+
+      if 'm' in line:
+        markup = self.getMarkup(line['m'])
+      else:
+        markup = self.getMarkup('normal')
+      if 't' in line:
+        self.screen.addstr(y,x,line['t'],markup)
+      else:
+        self.screen.addstr(y,x,"Line is an invalid format")
+
+  def splash(self, text, border=True):
+    try:
+      self.screen.clear()
+      if border: self.screen.border(1)
+      maxy,maxx=self.screen.getmaxyx()
+      if len(text)>maxy:
+        text=text[:maxy-2] # Shorten text if window too small
+      textlength = max([len(x) for x in text])
+      if textlength < maxx - 4: # 4 represents a border of 2 on each side
+        start = int((maxx/2)-(textlength/2))
+      else:
+        start = 2
+      # Print the splash text
+      for i, line in enumerate(text): self._print(i+1, start, line)
+      self.screen.refresh()
+      self.screen.getch()
+    except Exception as e:
+      self.stop()
+      raise(e)
+
+  def scroll(self, text,header=[],footer=[],cursor=False,blocking=True,nav={}):
     try:
       # Default Values
       contInd=0
@@ -116,24 +150,16 @@ class Specter():
         # Print the content to the screen
         #  - Header
         for i,line in enumerate(header):
-          self.screen.addstr(i+1,2,line, self.getMarkup('header'))
+          self._print(i+1, 2, line, self.getMarkup('header'))
         #  - Content
         for i,line in enumerate(lines):
-          if 'm' in line:
-            markup = self.getMarkup(line['m'])
-          else:
-            markup = self.getMarkup('normal')
-          if 't' in line:
-            self.screen.addstr(i+s,2,line['t'],markup)
-          # Temporarily removed key/val format
-          else:
-            self.screen.addstr(i+s,2,"Line is an invalid format")
+          self._print(i+s, 2, line)
         # Set cursor if needed
         if cursor:
-          self.screen.addstr(cursPos+s,1,">")
+          self._print(cursPos+s,1,">")
         #  - Footer
         for i,line in enumerate(footer):
-          self.screen.addstr((maxy-len(footer)-1)+i,2,line, self.getMarkup('footer'))
+          self._print((maxy-len(footer)-1)+i,2,line, self.getMarkup('footer'))
 
         # Wait for the user to make a move
         key=self.screen.getch()
