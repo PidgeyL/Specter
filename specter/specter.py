@@ -51,6 +51,7 @@ class Specter():
             self.markup[mk]=curses.color_pair(colorID) | curses.A_BOLD
           else:
             self.markup[mk]=curses.color_pair(colorID)
+        colorID+=1
     except Exception as e:
       print(e)
       raise(MarkupException)
