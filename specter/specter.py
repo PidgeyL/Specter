@@ -4,6 +4,15 @@ import curses
 from . import Defaults as defaults
 from .Exceptions import MarkupException
 
+
+def cursWrapped(func):
+  def curs_wrapper(*args, **kwargs):
+    try:
+      return func(*args, **kwargs)
+    except:
+      curses.endwin()
+  return curs_wrapper
+
 class Specter():
   def __init__(self, markupSet={}):
     self.screen = None
@@ -65,6 +74,10 @@ class Specter():
       print(self.markup)
       raise(MarkupException)
 
+  def getMaxXY(self):
+    y, x = self.screen.getmaxyx()
+    return (x, y) # Personally I like X, Y better for math reasons
+
   def _print(self, y, x, line, markdown=None):
     if type(line) == str: line = {'t': line} # Transform to dict
     if type(line) == dict: # Valid line to print
@@ -79,6 +92,7 @@ class Specter():
       else:
         self.screen.addstr(y,x,"Line is an invalid format")
 
+  @cursWrapped
   def splash(self, text, border=True):
     try:
       self.screen.clear()
@@ -99,6 +113,7 @@ class Specter():
       self.stop()
       raise(e)
 
+  @cursWrapped
   def scroll(self, text,header=[],footer=[],cursor=False,blocking=True,nav={}):
     try:
       # Default Values
