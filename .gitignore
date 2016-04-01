@@ -1,0 +1,4 @@
+build/
+dist/
+specter.egg-info/
+specter/__pycache__/
