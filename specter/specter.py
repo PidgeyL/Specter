@@ -1,5 +1,6 @@
 import copy
 import curses
+import traceback
 
 from . import Defaults as defaults
 from .Exceptions import MarkupException
@@ -10,13 +11,14 @@ def cursWrapped(func):
     try:
       return func(*args, **kwargs)
     except:
-      curses.endwin()
+      print(traceback.print_exc())
   return curs_wrapper
 
 class Specter():
-  def __init__(self, markupSet={}):
+  def __init__(self, markupSet={}, border=2):
     self.screen = None
     try:
+      self.border=border
       self.start()
       self.setMarkupSet(markupSet)
     except Exception as e:
@@ -41,6 +43,16 @@ class Specter():
       self.screen = None
     except Exception as e:
       print(e)
+
+  def getBorder(self):
+    return self.border
+
+  def setBorder(self, border):
+    if type(border) == int:
+      self.border = border
+      return True
+    else:
+      return False
 
   def getMarkupSet(self):
     return self.markup
@@ -92,6 +104,16 @@ class Specter():
       else:
         self.screen.addstr(y,x,"Line is an invalid format")
 
+  def _getLen(self, text):
+    if type(text) == dict and 't' in text: text=text['t']
+    if type(text) == str: return len(text)
+    else: return 0
+
+  def _cutText(self, text, start, end):
+    if type(text) == dict and 't' in text: text['t']=text['t'][start:end]
+    if type(text) == str: text=text[start:end]
+    return text
+
   @cursWrapped
   def splash(self, text, border=True):
     try:
@@ -120,6 +142,9 @@ class Specter():
       contInd=0
       cursInd=0
       cursPos=0
+      sideInd=0
+      sideMax=max([self._getLen(x) for x in text])
+      b=self.border
 
       # Extend the navigation
       navSet = copy.copy(defaults.navSet) # Copy default settings
@@ -159,23 +184,26 @@ class Specter():
         maxCont=maxy-len(header)-len(footer)-4
         s=len(header)+2 if len(header)!=0 else 1
         self.screen.clear()
-        lines=list(text)
+        lines=copy.deepcopy(text)
         # Take only the content that fits on the screen
-        if len(text)>maxCont:
-          lines=lines[contInd:contInd+maxCont]
+        # Y-axis
+        if len(text)>maxCont: lines=lines[contInd:contInd+maxCont]
+        #X-axis
+        for line in lines: self._cutText(line, sideInd, maxx+sideInd-b)
+
         # Print the content to the screen
         #  - Header
         for i,line in enumerate(header):
-          self._print(i+1, 2, line, self.getMarkup('header'))
+          self._print(i+1, b, line, self.getMarkup('header'))
         #  - Content
         for i,line in enumerate(lines):
-          self._print(i+s, 2, line)
+          self._print(i+s, b, line)
         # Set cursor if needed
         if cursor:
           self._print(cursPos+s,1,">")
         #  - Footer
         for i,line in enumerate(footer):
-          self._print((maxy-len(footer)-1)+i,2,line, self.getMarkup('footer'))
+          self._print((maxy-len(footer)-1)+i,b,line, self.getMarkup('footer'))
 
         # Wait for the user to make a move
         key=self.screen.getch()
@@ -193,6 +221,10 @@ class Specter():
             if cursPos<maxCont-1 and cursPos<len(text)-1:cursPos+=1
           else:
             if (len(text)-contInd)>maxCont:contInd+=1
+        elif key in navSet['left']:
+          if sideInd > 0: sideInd-=1
+        elif key in navSet['right']:
+          if sideInd + maxx -b*2< sideMax: sideInd+=1
         elif key in navSet['esc']:
           return chr(key) if blocking else (chr(key),cursInd)
         elif key in navSet['enter'] and cursor:
