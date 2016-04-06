@@ -144,6 +144,7 @@ class Specter():
       cursPos=0
       sideInd=0
       sideMax=max([self._getLen(x) for x in text])
+      
       b=self.border
 
       # Extend the navigation
@@ -225,6 +226,26 @@ class Specter():
           if sideInd > 0: sideInd-=1
         elif key in navSet['right']:
           if sideInd + maxx -b*2< sideMax: sideInd+=1
+        elif key in navSet['home']:
+          sideInd = 0
+        elif key in navSet['end']:
+          sideInd = sideMax - maxx - b*2
+        elif key in navSet['next']:
+          if sideInd + maxx - b*2 <= sideMax - maxx - b*2:
+            sideInd = sideInd + maxx - b*2
+          else:
+            sideInd = sideMax - maxx + b*2
+        elif key in navSet['prev']:
+          if sideInd - maxx + b*2 >= 0:
+            sideInd = sideInd - maxx + b*2
+          else:
+            sideInd = 0
+        elif key in navSet['pg_up']:
+          if contInd - maxCont >= 0: contInd-=maxCont
+          else: contInd = 0
+        elif key in navSet['pg_dn']:
+          if contInd + maxCont < len(text):contInd+=maxCont
+          else: contInd = len(text)-maxCont
         elif key in navSet['esc']:
           return chr(key) if blocking else (chr(key),cursInd)
         elif key in navSet['enter'] and cursor:

@@ -21,4 +21,10 @@ navSet = {'up':    [curses.KEY_UP],
           'left':  [curses.KEY_LEFT],
           'right': [curses.KEY_RIGHT],
           'esc':   [KEY_ESC],
-          'enter': [KEY_ENTER]}
+          'enter': [KEY_ENTER],
+          'home':  [],
+          'end':   [],
+          'next':  [],
+          'prev':  [],
+          'pg_up': [],
+          'pg_dn': []}
