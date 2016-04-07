@@ -11,8 +11,16 @@ splash = [{'t': 'random splash screen', 'm': 'title'},
 for i in range(1, 11):
   text.extend([{'t': "line "+ str(i)}])
 text.extend([{'t': longString}])
+text.extend([{'t': 'Press e or u for examples of functions bound to keys'}])
+
+def example():
+  screen.splash([{'t': 'This is an example :)'}])
+
+def userinput():
+  inp = screen.userInput("Type some text")
+  screen.splash(inp)
 
 screen.start()
 screen.splash(splash)
-screen.scroll(text)
+screen.scroll(text, functions={'e': example, 'u': userinput})
 screen.stop()

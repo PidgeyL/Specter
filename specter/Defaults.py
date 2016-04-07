@@ -28,3 +28,5 @@ navSet = {'up':    [curses.KEY_UP],
           'prev':  [],
           'pg_up': [],
           'pg_dn': []}
+
+navKeys = navSet.keys()

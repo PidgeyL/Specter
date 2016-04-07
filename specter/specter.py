@@ -122,7 +122,7 @@ class Specter():
       maxy,maxx=self.screen.getmaxyx()
       if len(text)>maxy:
         text=text[:maxy-2] # Shorten text if window too small
-      textlength = max([len(x) for x in text])
+      textlength = max([self._getLen(x) for x in text])
       if textlength < maxx - 4: # 4 represents a border of 2 on each side
         start = int((maxx/2)-(textlength/2))
       else:
@@ -136,7 +136,7 @@ class Specter():
       raise(e)
 
   @cursWrapped
-  def scroll(self, text,header=[],footer=[],cursor=False,blocking=True,nav={}):
+  def scroll(self, text,header=[],footer=[],cursor=False,blocking=True,nav={}, functions={}):
     try:
       # Default Values
       contInd=0
@@ -252,8 +252,11 @@ class Specter():
           if 'a' in text[cursInd]: # There is an action
             text[cursInd]['a']()
         else:
-          if not blocking:
+          if chr(key) in functions.keys():
+            functions[chr(key)]()
+          elif not blocking:
             return (chr(key),cursInd)
+
     except Exception as e:
       self.stop()
       raise(e)
