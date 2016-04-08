@@ -1,5 +1,5 @@
 import copy
-import curses
+import curses, curses.panel
 import traceback
 
 from . import Defaults as defaults
@@ -260,3 +260,22 @@ class Specter():
     except Exception as e:
       self.stop()
       raise(e)
+
+
+  def userInput(self, text):
+    x, y = self.getMaxXY()
+    newScreen=curses.newwin(4, x, y-5, 0)
+    newScreen.erase()
+    newScreen.box()
+    newScreen.addstr(1,2,text)
+    newScreen.addstr(2,3,'>')
+    curses.echo()
+    line=newScreen.getstr(2,5).strip().lower()
+    line=str(line,'utf-8')
+    curses.noecho()
+    newPanel=curses.panel.new_panel(newScreen)
+    newPanel.top()
+    curses.panel.update_panels()
+    self.screen.refresh()
+    return line
+

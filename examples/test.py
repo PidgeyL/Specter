@@ -18,7 +18,7 @@ def example():
 
 def userinput():
   inp = screen.userInput("Type some text")
-  screen.splash(inp)
+  screen.splash([inp])
 
 screen.start()
 screen.splash(splash)
