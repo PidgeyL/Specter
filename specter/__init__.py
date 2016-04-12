@@ -11,6 +11,7 @@
 """
 
 from .specter import Specter
+from .Debugger import Debugger
 
 __copyright__ = 'Copyright 2016 by Moreels Pieter-Jan'
 __version__ = '0.1.0'
