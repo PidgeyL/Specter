@@ -1,5 +1,6 @@
 import copy
 import curses, curses.panel
+import sys
 import traceback
 
 from . import Defaults as defaults
@@ -11,7 +12,8 @@ def cursWrapped(func):
     try:
       return func(*args, **kwargs)
     except:
-      print(traceback.print_exc())
+      curses.endwin()
+      sys.exit(traceback.print_exc())
   return curs_wrapper
 
 class Specter():
@@ -144,7 +146,6 @@ class Specter():
       cursPos=0
       sideInd=0
       sideMax=max([self._getLen(x) for x in text])
-      
       b=self.border
 
       # Extend the navigation
@@ -250,7 +251,10 @@ class Specter():
           return chr(key) if blocking else (chr(key),cursInd)
         elif key in navSet['enter'] and cursor:
           if 'a' in text[cursInd]: # There is an action
-            text[cursInd]['a']()
+            if 'p' in text[cursInd]:
+              text[cursInd]['a'](text[cursInd]['p'])
+            else:
+              text[cursInd]['a']()
         else:
           if chr(key) in functions.keys():
             functions[chr(key)]()
