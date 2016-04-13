@@ -13,6 +13,15 @@
 from .specter import Specter
 from .Debugger import Debugger
 
+import curses
+
+KEY_RIGHT = curses.KEY_RIGHT
+KEY_LEFT  = curses.KEY_LEFT
+KEY_UP    = curses.KEY_UP
+KEY_DOWN  = curses.KEY_DOWN
+KEY_ESC   = 27
+KEY_ENTER = 10
+
 __copyright__ = 'Copyright 2016 by Moreels Pieter-Jan'
 __version__ = '0.1.0'
 __license__ = 'BSD'
