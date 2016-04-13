@@ -11,6 +11,9 @@ def cursWrapped(func):
   def curs_wrapper(*args, **kwargs):
     try:
       return func(*args, **kwargs)
+    except KeyboardInterrupt:
+      curses.endwin()
+      sys.exit("KeyboardInterrupt: Exiting gracefully")
     except:
       curses.endwin()
       sys.exit(traceback.print_exc())
