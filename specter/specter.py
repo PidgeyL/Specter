@@ -152,8 +152,9 @@ class Specter():
       b=self.border
 
       # Extend the navigation
-      navSet = copy.copy(defaults.navSet) # Copy default settings
-      for dKey in nav.keys(): # Add all the custom keys
+      navSet = copy.deepcopy(defaults.navSet) # Copy default settings
+      userNav= copy.deepcopy(nav)
+      for dKey in userNav.keys(): # Add all the custom keys
         if dKey not in navSet.keys(): navSet[dKey]=[] # Ensure it exists
         for val in nav[dKey]: # Add all values that match the type
           if   type(val) is int: navSet[dKey].append(val)
