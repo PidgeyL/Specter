@@ -95,7 +95,8 @@ class Specter():
     y, x = self.screen.getmaxyx()
     return (x, y) # Personally I like X, Y better for math reasons
 
-  def _print(self, y, x, line, markdown=None):
+  def _print(self, y, x, line, markdown=None, dest=None):
+    if not dest: dest = self.screen
     if type(line) == str: line = {'t': line} # Transform to dict
     if type(line) == dict: # Valid line to print
       if type(markdown) == str: line['m']=markdown # Apply markdown
@@ -105,9 +106,9 @@ class Specter():
       else:
         markup = self.getMarkup('normal')
       if 't' in line:
-        self.screen.addstr(y,x,line['t'],markup)
+        dest.addstr(y,x,line['t'],markup)
       else:
-        self.screen.addstr(y,x,"Line is an invalid format")
+        dest.addstr(y,x,"Line is an invalid format")
 
   def _getLen(self, text):
     if type(text) == dict and 't' in text: text=text['t']
@@ -275,8 +276,8 @@ class Specter():
     newScreen=curses.newwin(4, x, y-5, 0)
     newScreen.erase()
     newScreen.box()
-    newScreen.addstr(1,2,text)
-    newScreen.addstr(2,3,'>')
+    self._print(1,2,text, dest=newScreen)
+    self._print(2,3,">", dest=newScreen)
     curses.echo()
     line=newScreen.getstr(2,5).strip().lower()
     line=str(line,'utf-8')
@@ -287,3 +288,22 @@ class Specter():
     self.screen.refresh()
     return line
 
+  def popup(self, text):
+    length = max([self._getLen(x) for x in text])
+    x, y = self.getMaxXY()
+    lines = copy.deepcopy(text)
+    for line in lines: self._cutText(line, 0, x-2)
+    winX = min(x-2, length+4)
+    winY = min(x-2, len(lines)+2)
+    posX = int((x-winX)/2)
+    posY = int((y-winY)/2)
+    newScreen=curses.newwin(winY, winX, posY, posX)
+    newScreen.erase()
+    newScreen.box()
+    for i,line in enumerate(lines):
+      self._print(i+1, 2, line, dest=newScreen)
+    newScreen.getch()
+    newPanel=curses.panel.new_panel(newScreen)
+    newPanel.top()
+    curses.panel.update_panels()
+    self.screen.refresh()

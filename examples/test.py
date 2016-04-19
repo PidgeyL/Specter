@@ -1,6 +1,10 @@
 from specter import Specter
 
 screen = Specter()
+
+def popup():
+  screen.popup(["This is a", "multiline popup"])
+
 def example2(p):
   screen.splash(p)
 
@@ -26,5 +30,5 @@ text.extend([{'t': 'Press Enter here to perform a function with args', 'a': exam
 
 screen.start()
 screen.splash(splash)
-screen.scroll(text, functions={'e': example, 'u': userinput}, cursor=True)
+screen.scroll(text, functions={'e': example, 'u': userinput, 'p': popup}, cursor=True)
 screen.stop()
