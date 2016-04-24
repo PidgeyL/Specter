@@ -5,7 +5,7 @@ import traceback
 
 from . import Defaults as defaults
 from .Exceptions import MarkupException
-
+from .Debugger import Debugger
 
 def cursWrapped(func):
   def curs_wrapper(*args, **kwargs):
@@ -26,6 +26,7 @@ class Specter():
       self.border=border
       self.start()
       self.setMarkupSet(markupSet)
+      self.tables={}
     except Exception as e:
       self.stop()
       raise(e)
@@ -105,8 +106,13 @@ class Specter():
         markup = self.getMarkup(line['m'])
       else:
         markup = self.getMarkup('normal')
+      
       if 't' in line:
         dest.addstr(y,x,line['t'],markup)
+      elif 'tn' in line and 'tc' in line:
+        for i, cell in enumerate(line['tc']):
+          offset=sum(self.tables[line['tn']][:i])
+          self._print(y, x+offset, cell)
       else:
         dest.addstr(y,x,"Line is an invalid format")
 
@@ -116,10 +122,46 @@ class Specter():
     else: return 0
 
   def _cutText(self, text, start, end):
-    if type(text) == dict and 't' in text: text['t']=text['t'][start:end]
-    if type(text) == str: text=text[start:end]
+    if type(text) == dict:
+      if 't' in text: text['t']=text['t'][start:end]
+      elif 'tc' in text and 'tn' in text:
+        for i, cell in enumerate(self.tables[text['tn']]):
+          if cell is 0:
+            text['tc'][i]=""
+          else:
+            start -= sum(self.tablesOrig[text['tn']][:i])
+            text['tc'][i] = self._cutText(text['tc'][i], start, end)
+            break
+    elif type(text) == str: text=text[start:end]
     return text
 
+  def _generateTables(self, lines, offset, border = 1):
+    self.tables={}
+    # Check for tables. tn for tablename and tc for tablecells
+    for line in lines:
+      if type(line) is dict and 'tn' in line and 'tc' in line:
+        if line['tn'] in self.tables:
+          multiplier = (len(self.tables[line['tn']])-len(line['tc']))
+          self.tables[line['tn']].extend([0]*multiplier)
+          for i, cell in enumerate(line['tc']):
+            width=max(self.tables[line['tn']][i], len(str(cell)))
+            self.tables[line['tn']][i]=width+border
+        else: self.tables[line['tn']]=[len(x)+border for x in line['tc']]
+    self.tablesOrig = copy.deepcopy(self.tables)
+
+    lastTN=""
+    for line in lines:
+      if (type(line) is dict and 'tn' in line and 'tc' in line and
+         lastTN != line['tn']):
+        lastTN = line['tn']
+        for i, cell in enumerate(line['tc']):
+          if self.tables[line['tn']][i] <= offset:
+            offset -= self.tables[line['tn']][i]
+            self.tables[line['tn']][i]=0
+          elif offset is not 0:
+            self.tables[line['tn']][i]-=offset
+            offset=0
+    
   @cursWrapped
   def splash(self, text, border=True):
     try:
@@ -191,7 +233,9 @@ class Specter():
         maxCont=maxy-len(header)-len(footer)-4
         s=len(header)+2 if len(header)!=0 else 1
         self.screen.clear()
-        lines=copy.deepcopy(text)
+        lines = copy.deepcopy(text)
+        # Make a list of the tables for printing
+        self._generateTables(lines, sideInd)
         # Take only the content that fits on the screen
         # Y-axis
         if len(text)>maxCont: lines=lines[contInd:contInd+maxCont]

@@ -22,6 +22,11 @@ splash = [{'t': 'random splash screen', 'm': 'title'},
           {'t': 'random text filling the screen'},
           {'t': ' '},
           {'t': '  [ Press enter to continue ]', 'm': 'bold'}]
+table = [{'tn': 'table1', 'tc': [{'t': "Head1", 'm': 'title'},   "Head2",   "Head3",  "Head4"]},
+         {'tn': 'table1', 'tc': ["val1",    "val2",    "val3",   "val 4" ]},
+         {'tn': 'table1', 'tc': ["value1",  "value__2",  "value3", "value4" ]}]
+text.extend(table)
+
 for i in range(1, 11):
   text.extend([{'t': "line "+ str(i)}])
 text.extend([{'t': longString}])
