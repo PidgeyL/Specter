@@ -108,7 +108,7 @@ class Specter():
         markup = self.getMarkup('normal')
       
       if 't' in line:
-        dest.addstr(y,x,line['t'],markup)
+        dest.addstr(y,x,str(line['t']),markup)
       elif 'tn' in line and 'tc' in line:
         for i, cell in enumerate(line['tc']):
           offset=sum(self.tables[line['tn']][:i])
@@ -117,6 +117,7 @@ class Specter():
         dest.addstr(y,x,"Line is an invalid format")
 
   def _getLen(self, text):
+    if type(text) is not dict and type(text) is not str: text = str(text)
     if type(text) == dict and 't' in text: text=text['t']
     if type(text) == str: return len(text)
     else: return 0
@@ -144,7 +145,7 @@ class Specter():
           multiplier = (len(self.tables[line['tn']])-len(line['tc']))
           self.tables[line['tn']].extend([0]*multiplier)
           for i, cell in enumerate(line['tc']):
-            width=max(self.tables[line['tn']][i], len(str(cell)))
+            width=max(self.tables[line['tn']][i], self._getLen(cell))
             self.tables[line['tn']][i]=width+border
         else: self.tables[line['tn']]=[len(x)+border for x in line['tc']]
     self.tablesOrig = copy.deepcopy(self.tables)
