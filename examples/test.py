@@ -11,6 +11,12 @@ def example2(p):
 def example():
   screen.splash([{'t': 'This is an example :)'}])
 
+def justified():
+  someText = ["This is a very long line. So long, it shouldn't fit on most screens. You should consider yourself lucky if this fits on a single screen. I'm coding this on a small laptop, so for me it doesn't fit",
+              {'t': "This is the second line of text", 'm': "bold"}]
+  to_print = screen._justify(someText)
+  screen.splash(to_print)
+
 def userinput():
   inp = screen.userInput("Type some text")
   screen.splash([inp])
@@ -32,6 +38,7 @@ for i in range(1, 11):
 text.extend([{'t': longString}])
 text.extend([{'t': 'Press e or u for examples of functions bound to keys'}])
 text.extend([{'t': 'Press Enter here to perform a function with args', 'a': example2, 'p': ["Some text"]}])
+text.extend([{'t': 'Press Enter here to show text in a justified splash screen', 'a': justified}])
 
 screen.start()
 screen.splash(splash)
