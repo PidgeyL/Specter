@@ -24,6 +24,7 @@ class SpecterShell(SpecterBase):
     super().__init__(markupSet, border=0)
     self.backlog = []
     self.backend = backend
+    self.cursor = ">"
 
   def writeln(self, line):
     self.backlog.append(line)
@@ -31,12 +32,28 @@ class SpecterShell(SpecterBase):
     self.backlog = self.backlog[:-lines]
   @cursWrapped
   def refresh(self):
+    if not self.screen: return
     self.screen.clear()
     to_print = self._justify(self.backlog)
     X, Y = self.getMaxXY()
     for y, line in enumerate(to_print[-Y+2:]):
       self._print(y, 0, line)
+    # redraw the cursor
+    self._print(Y-1,1,self.cursor)
     self.screen.refresh()
+
+  def _shellPrompt(self):
+    try:
+      X, Y = self.getMaxXY()
+      curses.echo()
+      self._print(Y-1,1,self.cursor)
+      line=self.screen.getstr(Y-1,len(self.cursor)+2).strip().lower()
+      line=str(line,'utf-8')
+      curses.noecho()
+      self.refresh()
+      return line
+    except:
+      return ""
 
   @cursWrapped
   def listen(self):
@@ -46,24 +63,6 @@ class SpecterShell(SpecterBase):
       self.running = False
       t=None
 
-  def _shellPrompt(self, cursor=">"):
-    try:
-      x, y = self.getMaxXY()
-      newScreen=curses.newwin(1, x, y-2, 0)
-      newScreen.erase()
-      self._print(0,1,cursor, dest=newScreen)
-      curses.echo()
-      line=newScreen.getstr(0,len(cursor)+2).strip().lower()
-      line=str(line,'utf-8')
-      curses.noecho()
-      newPanel=curses.panel.new_panel(newScreen)
-      newPanel.top()
-      curses.panel.update_panels()
-      self.screen.refresh()
-      return line
-    except:
-      return ""
-
   def _listen(self):
     self.running = True
     while self.running:
@@ -71,14 +70,6 @@ class SpecterShell(SpecterBase):
       self.backend.userinput(message)
     self.running = False
 
-  def _listen_(self):
-    self.running = True
-    while self.running:
-      try:
-        message = self._shellPrompt()
-      except EOFError:
-        break
-      except KeyboardInterrupt:
-        break
-      self.backend.userinput(message)
-    self.running = False
+  def stop(self):
+    self.running=False
+    super().stop()

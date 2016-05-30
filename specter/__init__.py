@@ -24,7 +24,7 @@ KEY_ESC   = 27
 KEY_ENTER = 10
 
 __copyright__ = 'Copyright 2016 by Moreels Pieter-Jan'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __license__ = 'BSD'
 __author__ = 'Moreels Pieter-Jan'
 __email__ = 'pieterjan.moreels@gmail.com'
